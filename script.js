@@ -1,6 +1,15 @@
-const STORAGE_KEY = 'todos_v1';
+const SUPABASE_URL = 'https://fpmyvjkhbjvfqjoctlfy.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwbXl2amtoYmp2ZnFqb2N0bGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3OTA1ODYsImV4cCI6MjA5MjM2NjU4Nn0.nSfdJhEBYkmAtedTaP0G9g4R_gwIXYL946maxKHgyo8';
 
-let todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+const API = `${SUPABASE_URL}/rest/v1/todos`;
+const HEADERS = {
+  'apikey': SUPABASE_ANON_KEY,
+  'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation',
+};
+
+let todos = [];
 let filter = 'all';
 
 const form = document.getElementById('todoForm');
@@ -10,12 +19,58 @@ const remainingEl = document.getElementById('remaining');
 const clearBtn = document.getElementById('clearCompleted');
 const filterBtns = document.querySelectorAll('.filter-btn');
 
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+async function apiFetch(url, options = {}) {
+  const res = await fetch(url, { headers: HEADERS, ...options });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
 }
 
-function getId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+async function loadTodos() {
+  todos = await apiFetch(`${API}?order=created_at.asc`);
+  render();
+}
+
+async function addTodo(text) {
+  const created = await apiFetch(API, {
+    method: 'POST',
+    body: JSON.stringify({ text, done: false }),
+  });
+  todos.push(created[0]);
+  render();
+}
+
+async function toggleTodo(id) {
+  const todo = todos.find(t => t.id === id);
+  await apiFetch(`${API}?id=eq.${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ done: !todo.done }),
+  });
+  todo.done = !todo.done;
+  render();
+}
+
+async function updateTodo(id, text) {
+  await apiFetch(`${API}?id=eq.${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ text }),
+  });
+  todos.find(t => t.id === id).text = text;
+  render();
+}
+
+async function removeTodo(id) {
+  await apiFetch(`${API}?id=eq.${id}`, { method: 'DELETE' });
+  todos = todos.filter(t => t.id !== id);
+  render();
+}
+
+async function clearCompleted() {
+  const ids = todos.filter(t => t.done).map(t => t.id);
+  if (!ids.length) return;
+  await apiFetch(`${API}?id=in.(${ids.join(',')})`, { method: 'DELETE' });
+  todos = todos.filter(t => !t.done);
+  render();
 }
 
 function getVisible() {
@@ -52,7 +107,7 @@ function buildItem(todo) {
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
   checkbox.checked = todo.done;
-  checkbox.addEventListener('change', () => toggle(todo.id));
+  checkbox.addEventListener('change', () => toggleTodo(todo.id));
 
   const span = document.createElement('span');
   span.className = 'todo-text';
@@ -70,7 +125,7 @@ function buildItem(todo) {
   deleteBtn.className = 'btn-delete';
   deleteBtn.textContent = '✕';
   deleteBtn.title = 'Sil';
-  deleteBtn.addEventListener('click', () => remove(todo.id));
+  deleteBtn.addEventListener('click', () => removeTodo(todo.id));
 
   li.append(checkbox, span, editBtn, deleteBtn);
   return li;
@@ -87,54 +142,35 @@ function startEdit(span, id) {
   window.getSelection().removeAllRanges();
   window.getSelection().addRange(range);
 
-  function commit() {
+  const originalText = todos.find(t => t.id === id)?.text || '';
+
+  async function commit() {
     span.contentEditable = 'false';
     const newText = span.textContent.trim();
-    if (!newText) {
-      remove(id);
-      return;
-    }
-    const todo = todos.find(t => t.id === id);
-    if (todo) { todo.text = newText; save(); render(); }
     span.removeEventListener('blur', commit);
     span.removeEventListener('keydown', onKey);
+    if (!newText) { removeTodo(id); return; }
+    if (newText !== originalText) await updateTodo(id, newText);
   }
 
   function onKey(e) {
     if (e.key === 'Enter') { e.preventDefault(); commit(); }
-    if (e.key === 'Escape') { span.textContent = todos.find(t => t.id === id)?.text || ''; commit(); }
+    if (e.key === 'Escape') { span.textContent = originalText; span.contentEditable = 'false'; }
   }
 
   span.addEventListener('blur', commit);
   span.addEventListener('keydown', onKey);
 }
 
-function toggle(id) {
-  const todo = todos.find(t => t.id === id);
-  if (todo) { todo.done = !todo.done; save(); render(); }
-}
-
-function remove(id) {
-  todos = todos.filter(t => t.id !== id);
-  save();
-  render();
-}
-
-form.addEventListener('submit', e => {
+form.addEventListener('submit', async e => {
   e.preventDefault();
   const text = input.value.trim();
   if (!text) return;
-  todos.push({ id: getId(), text, done: false });
   input.value = '';
-  save();
-  render();
+  await addTodo(text);
 });
 
-clearBtn.addEventListener('click', () => {
-  todos = todos.filter(t => !t.done);
-  save();
-  render();
-});
+clearBtn.addEventListener('click', clearCompleted);
 
 filterBtns.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -145,4 +181,4 @@ filterBtns.forEach(btn => {
   });
 });
 
-render();
+loadTodos();
