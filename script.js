@@ -623,9 +623,36 @@ document.getElementById('saveBudgetBtn').addEventListener('click', () => {
   renderBudget();
 });
 
+// ── Mobil tab navigasyonu ─────────────────────────────────
+function initMobileTabs() {
+  const todoPanel    = document.getElementById('todoPanel');
+  const financePanel = document.getElementById('financePanel');
+  const tabTodo      = document.getElementById('mobileTabTodo');
+  const tabFinance   = document.getElementById('mobileTabFinance');
+
+  function switchPanel(active) {
+    if (active === 'todo') {
+      todoPanel.classList.add('mobile-active');
+      financePanel.classList.remove('mobile-active');
+      tabTodo.classList.add('active');
+      tabFinance.classList.remove('active');
+    } else {
+      financePanel.classList.add('mobile-active');
+      todoPanel.classList.remove('mobile-active');
+      tabFinance.classList.add('active');
+      tabTodo.classList.remove('active');
+    }
+  }
+
+  switchPanel('todo');
+  tabTodo.addEventListener('click', () => switchPanel('todo'));
+  tabFinance.addEventListener('click', () => switchPanel('finance'));
+}
+
 // ── Boot ──────────────────────────────────────────────────
 (async () => {
   applyTheme(localStorage.getItem('nexus_theme') || 'dark');
+  initMobileTabs();
 
   const wasConfirmed = await handleHashTokens();
   if (!wasConfirmed && session?.access_token) {

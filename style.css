@@ -485,17 +485,69 @@ body {
 }
 .trans-item .btn-delete:hover { color: var(--red); background: rgba(255,77,109,.1); }
 
-/* ── Responsive ───────────────────────────────────────── */
+/* ── Responsive / Mobil Tab ───────────────────────────── */
 @media (max-width: 720px) {
   .panels {
     padding: 12px;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom));
-    gap: 12px;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    gap: 0;
+    position: relative;
   }
-  .panel { min-width: 100%; }
+
+  /* Paneller üst üste, aktif olmayan gizli */
+  .panel {
+    min-width: 100%;
+    display: none;
+  }
+  .panel.mobile-active {
+    display: block;
+  }
+
+  /* Alt tab bar */
+  .mobile-tabs {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 20;
+    background: rgba(8,14,28,.95);
+    border-top: 1px solid var(--border);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .mobile-tab {
+    flex: 1; padding: 12px 8px 10px;
+    background: none; border: none;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--text-lo); cursor: pointer; transition: color 0.2s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-tab.active { color: var(--cyan); }
+  #mobileTabFinance.active { color: var(--purple); }
+
+  .mobile-tab-icon { font-size: 1.2rem; line-height: 1; }
+  .mobile-tab-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+
   .topbar {
     padding: 11px 16px;
     padding-top: calc(11px + env(safe-area-inset-top));
   }
   .topbar-right span { display: none; }
+}
+
+[data-theme="light"] .mobile-tabs {
+  background: rgba(244,247,253,.95);
+}
+
+/* Masaüstünde tab bar gizli */
+@media (min-width: 721px) {
+  .mobile-tabs { display: none; }
+  .panel { display: block !important; }
 }
