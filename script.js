@@ -187,11 +187,15 @@ function buildItem(todo) {
   editBtn.className = 'btn-edit'; editBtn.textContent = '✎'; editBtn.title = 'Düzenle';
   editBtn.addEventListener('click', () => startEdit(span, todo.id));
 
+  const mood = document.createElement('span');
+  mood.className = 'todo-mood';
+  mood.textContent = todo.done ? '😊' : '😠';
+
   const delBtn = document.createElement('button');
   delBtn.className = 'btn-delete'; delBtn.textContent = '✕'; delBtn.title = 'Sil';
   delBtn.addEventListener('click', () => removeTodo(todo.id));
 
-  li.append(cb, span, editBtn, delBtn);
+  li.append(cb, mood, span, editBtn, delBtn);
   return li;
 }
 

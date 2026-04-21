@@ -266,6 +266,8 @@ body {
 
 .todo-item.completed { opacity: 0.55; }
 
+.todo-mood { font-size: 1.1rem; flex-shrink: 0; line-height: 1; }
+
 .todo-item input[type="checkbox"] {
   width: 18px;
   height: 18px;
