@@ -77,15 +77,11 @@
 
       <!-- GÖREVLER -->
       <div class="panel" id="todoPanel">
-        <div class="panel-header">
-          <h2 class="panel-title">Görevler</h2>
-        </div>
-
+        <div class="panel-header"><h2 class="panel-title">Görevler</h2></div>
         <form class="input-row" id="todoForm">
           <input type="text" id="todoInput" placeholder="Yeni görev ekle..." autocomplete="off" />
           <button type="submit">Ekle</button>
         </form>
-
         <button class="extra-toggle" id="todoExtraToggle">+ Seçenekler</button>
         <div class="todo-extra" id="todoExtra">
           <div class="extra-field">
@@ -102,15 +98,12 @@
             </select>
           </div>
         </div>
-
         <div class="filters">
           <button class="filter-btn active" data-filter="all">Tümü</button>
           <button class="filter-btn" data-filter="active">Aktif</button>
           <button class="filter-btn" data-filter="completed">Tamamlanan</button>
         </div>
-
         <ul id="todoList"></ul>
-
         <div class="footer">
           <span id="remaining"></span>
           <button id="clearCompleted">Tamamlananları sil</button>
@@ -119,10 +112,7 @@
 
       <!-- GELİR/GİDER -->
       <div class="panel" id="financePanel">
-        <div class="panel-header">
-          <h2 class="panel-title">Gelir / Gider</h2>
-        </div>
-
+        <div class="panel-header"><h2 class="panel-title">Gelir / Gider</h2></div>
         <div class="finance-summary">
           <div class="summary-card gelir-card">
             <span class="summary-label">Toplam Gelir</span>
@@ -137,8 +127,6 @@
             <span class="summary-amount" id="netBakiye">0,00 ₺</span>
           </div>
         </div>
-
-        <!-- Aylık Hedefler -->
         <div class="budget-section">
           <div class="budget-header">
             <span class="budget-title">Aylık Hedefler</span>
@@ -160,7 +148,6 @@
             <button type="button" id="saveBudgetBtn">Kaydet</button>
           </div>
         </div>
-
         <form class="transaction-form" id="transactionForm">
           <div class="type-toggle">
             <button type="button" class="type-btn active" data-type="gelir">+ Gelir</button>
@@ -172,8 +159,74 @@
             <button type="submit">Ekle</button>
           </div>
         </form>
-
         <ul id="transactionList"></ul>
+      </div>
+
+      <!-- M2 HESAPLAMA -->
+      <div class="panel" id="m2Panel">
+        <div class="panel-header"><h2 class="panel-title panel-title--green">M² Hesaplama</h2></div>
+
+        <div class="m2-form">
+          <div class="m2-inputs">
+            <div class="extra-field">
+              <label>En (metre)</label>
+              <input type="number" id="m2En" placeholder="0.00" min="0" step="0.01" />
+            </div>
+            <div class="extra-field">
+              <label>Boy (metre)</label>
+              <input type="number" id="m2Boy" placeholder="0.00" min="0" step="0.01" />
+            </div>
+          </div>
+          <div class="m2-actions">
+            <input type="text" id="m2Label" placeholder="Alan adı (isteğe bağlı)" autocomplete="off" />
+            <button type="button" id="m2AddBtn">Ekle</button>
+          </div>
+        </div>
+
+        <div class="m2-total-box">
+          <span class="m2-total-label">Toplam Alan</span>
+          <span class="m2-total-value" id="m2Total">0,00 m²</span>
+        </div>
+
+        <ul id="m2List"></ul>
+
+        <button class="m2-clear-btn" id="m2ClearBtn">Listeyi Temizle</button>
+      </div>
+
+      <!-- HESAP MAKİNASI -->
+      <div class="panel" id="calcPanel">
+        <div class="panel-header"><h2 class="panel-title panel-title--yellow">Hesap Makinası</h2></div>
+
+        <div class="calc-display">
+          <div class="calc-expr" id="calcExpr"></div>
+          <div class="calc-screen" id="calcScreen">0</div>
+        </div>
+
+        <div class="calc-grid">
+          <button class="calc-btn span2" data-action="clear">AC</button>
+          <button class="calc-btn" data-action="sign">+/−</button>
+          <button class="calc-btn op" data-action="op" data-op="÷">÷</button>
+
+          <button class="calc-btn" data-digit="7">7</button>
+          <button class="calc-btn" data-digit="8">8</button>
+          <button class="calc-btn" data-digit="9">9</button>
+          <button class="calc-btn op" data-action="op" data-op="×">×</button>
+
+          <button class="calc-btn" data-digit="4">4</button>
+          <button class="calc-btn" data-digit="5">5</button>
+          <button class="calc-btn" data-digit="6">6</button>
+          <button class="calc-btn op" data-action="op" data-op="−">−</button>
+
+          <button class="calc-btn" data-digit="1">1</button>
+          <button class="calc-btn" data-digit="2">2</button>
+          <button class="calc-btn" data-digit="3">3</button>
+          <button class="calc-btn op" data-action="op" data-op="+">+</button>
+
+          <button class="calc-btn" data-action="pct">%</button>
+          <button class="calc-btn" data-digit="0">0</button>
+          <button class="calc-btn" data-action="dot">.</button>
+          <button class="calc-btn eq" data-action="eq">=</button>
+        </div>
       </div>
 
     </div>
@@ -187,6 +240,14 @@
       <button class="mobile-tab" id="mobileTabFinance">
         <span class="mobile-tab-icon">◈</span>
         <span class="mobile-tab-label">Finans</span>
+      </button>
+      <button class="mobile-tab" id="mobileTabM2">
+        <span class="mobile-tab-icon">⬚</span>
+        <span class="mobile-tab-label">M²</span>
+      </button>
+      <button class="mobile-tab" id="mobileTabCalc">
+        <span class="mobile-tab-icon">#</span>
+        <span class="mobile-tab-label">Hesap</span>
       </button>
     </nav>
 

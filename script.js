@@ -689,30 +689,181 @@ document.getElementById('saveBudgetBtn').addEventListener('click', () => {
   renderBudget();
 });
 
+// ── M2 Hesaplama ──────────────────────────────────────────
+let m2Rooms = JSON.parse(localStorage.getItem('nexus_m2') || '[]');
+
+function saveM2() { localStorage.setItem('nexus_m2', JSON.stringify(m2Rooms)); }
+
+function renderM2() {
+  const list  = document.getElementById('m2List');
+  const total = m2Rooms.reduce((s, r) => s + r.m2, 0);
+  document.getElementById('m2Total').textContent =
+    total.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' m²';
+
+  list.innerHTML = '';
+  if (!m2Rooms.length) {
+    const li = document.createElement('li');
+    li.className = 'empty-msg';
+    li.textContent = 'Henüz alan eklenmedi.';
+    list.appendChild(li);
+    return;
+  }
+
+  m2Rooms.forEach((r, i) => {
+    const li = document.createElement('li');
+    li.className = 'm2-item';
+
+    const info = document.createElement('div');
+    info.className = 'm2-item-info';
+
+    const name = document.createElement('span');
+    name.className = 'm2-item-name';
+    name.textContent = r.label || `Alan ${i + 1}`;
+
+    const dim = document.createElement('span');
+    dim.className = 'm2-item-dim';
+    dim.textContent = `${r.en} × ${r.boy} m`;
+
+    info.append(name, dim);
+
+    const val = document.createElement('span');
+    val.className = 'm2-item-val';
+    val.textContent = r.m2.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' m²';
+
+    const del = document.createElement('button');
+    del.className = 'btn-delete'; del.textContent = '✕';
+    del.addEventListener('click', () => { m2Rooms.splice(i, 1); saveM2(); renderM2(); });
+
+    li.append(info, val, del);
+    list.appendChild(li);
+  });
+}
+
+document.getElementById('m2AddBtn').addEventListener('click', () => {
+  const en  = parseFloat(document.getElementById('m2En').value);
+  const boy = parseFloat(document.getElementById('m2Boy').value);
+  if (isNaN(en) || isNaN(boy) || en <= 0 || boy <= 0) return;
+  const label = document.getElementById('m2Label').value.trim();
+  m2Rooms.push({ en, boy, m2: en * boy, label });
+  saveM2(); renderM2();
+  document.getElementById('m2En').value    = '';
+  document.getElementById('m2Boy').value   = '';
+  document.getElementById('m2Label').value = '';
+});
+
+document.getElementById('m2ClearBtn').addEventListener('click', () => {
+  if (!m2Rooms.length) return;
+  m2Rooms = []; saveM2(); renderM2();
+});
+
+// ── Hesap Makinası ────────────────────────────────────────
+let calcCurrent  = '0';
+let calcPrev     = '';
+let calcOp       = null;
+let calcNewInput = true;
+
+function calcUpdate() {
+  document.getElementById('calcScreen').textContent =
+    parseFloat(calcCurrent).toLocaleString('tr-TR', { maximumFractionDigits: 10 });
+}
+
+function calcApply() {
+  const a = parseFloat(calcPrev);
+  const b = parseFloat(calcCurrent);
+  let res;
+  if (calcOp === '+')  res = a + b;
+  if (calcOp === '−')  res = a - b;
+  if (calcOp === '×')  res = a * b;
+  if (calcOp === '÷')  res = b !== 0 ? a / b : 0;
+  return String(res);
+}
+
+document.getElementById('calcGrid') // bağlantı aşağıda
+document.querySelector('.calc-grid').addEventListener('click', e => {
+  const btn = e.target.closest('.calc-btn');
+  if (!btn) return;
+
+  const digit  = btn.dataset.digit;
+  const action = btn.dataset.action;
+  const op     = btn.dataset.op;
+
+  if (digit !== undefined) {
+    if (calcNewInput) { calcCurrent = digit; calcNewInput = false; }
+    else calcCurrent = calcCurrent === '0' ? digit : calcCurrent + digit;
+    document.getElementById('calcExpr').textContent = '';
+    calcUpdate();
+  }
+
+  if (action === 'dot') {
+    if (calcNewInput) { calcCurrent = '0.'; calcNewInput = false; }
+    else if (!calcCurrent.includes('.')) calcCurrent += '.';
+    calcUpdate();
+  }
+
+  if (action === 'clear') {
+    calcCurrent = '0'; calcPrev = ''; calcOp = null; calcNewInput = true;
+    document.getElementById('calcExpr').textContent = '';
+    calcUpdate();
+  }
+
+  if (action === 'sign') {
+    calcCurrent = String(-parseFloat(calcCurrent));
+    calcUpdate();
+  }
+
+  if (action === 'pct') {
+    calcCurrent = String(parseFloat(calcCurrent) / 100);
+    calcUpdate();
+  }
+
+  if (action === 'op') {
+    if (calcOp && !calcNewInput) {
+      calcCurrent = calcApply();
+      calcUpdate();
+    }
+    calcPrev = calcCurrent;
+    calcOp   = op;
+    calcNewInput = true;
+    document.getElementById('calcExpr').textContent = `${calcPrev} ${calcOp}`;
+  }
+
+  if (action === 'eq') {
+    if (!calcOp) return;
+    document.getElementById('calcExpr').textContent =
+      `${calcPrev} ${calcOp} ${calcCurrent} =`;
+    calcCurrent  = calcApply();
+    calcOp       = null;
+    calcPrev     = '';
+    calcNewInput = true;
+    calcUpdate();
+  }
+});
+
 // ── Mobil tab navigasyonu ─────────────────────────────────
 function initMobileTabs() {
-  const todoPanel    = document.getElementById('todoPanel');
-  const financePanel = document.getElementById('financePanel');
-  const tabTodo      = document.getElementById('mobileTabTodo');
-  const tabFinance   = document.getElementById('mobileTabFinance');
+  const panels = {
+    todo:    document.getElementById('todoPanel'),
+    finance: document.getElementById('financePanel'),
+    m2:      document.getElementById('m2Panel'),
+    calc:    document.getElementById('calcPanel'),
+  };
+  const tabs = {
+    todo:    document.getElementById('mobileTabTodo'),
+    finance: document.getElementById('mobileTabFinance'),
+    m2:      document.getElementById('mobileTabM2'),
+    calc:    document.getElementById('mobileTabCalc'),
+  };
 
   function switchPanel(active) {
-    if (active === 'todo') {
-      todoPanel.classList.add('mobile-active');
-      financePanel.classList.remove('mobile-active');
-      tabTodo.classList.add('active');
-      tabFinance.classList.remove('active');
-    } else {
-      financePanel.classList.add('mobile-active');
-      todoPanel.classList.remove('mobile-active');
-      tabFinance.classList.add('active');
-      tabTodo.classList.remove('active');
-    }
+    Object.keys(panels).forEach(k => {
+      panels[k].classList.toggle('mobile-active', k === active);
+      tabs[k].classList.toggle('active', k === active);
+    });
+    if (active === 'm2') renderM2();
   }
 
   switchPanel('todo');
-  tabTodo.addEventListener('click', () => switchPanel('todo'));
-  tabFinance.addEventListener('click', () => switchPanel('finance'));
+  Object.keys(tabs).forEach(k => tabs[k].addEventListener('click', () => switchPanel(k)));
 }
 
 // ── Boot ──────────────────────────────────────────────────

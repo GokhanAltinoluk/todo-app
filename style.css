@@ -485,6 +485,104 @@ body {
 }
 .trans-item .btn-delete:hover { color: var(--red); background: rgba(255,77,109,.1); }
 
+/* ── Panel başlık renk varyantları ───────────────────── */
+.panel-title--green  { color: var(--green);  text-shadow: 0 0 14px rgba(0,230,118,.3); }
+.panel-title--yellow { color: var(--yellow); text-shadow: 0 0 14px rgba(255,215,64,.3); }
+
+/* ── M2 Hesaplama ─────────────────────────────────────── */
+.m2-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+
+.m2-inputs { display: flex; gap: 8px; }
+.m2-inputs .extra-field { flex: 1; }
+
+.m2-actions { display: flex; gap: 8px; }
+.m2-actions input { flex: 1; }
+.m2-actions button {
+  padding: 9px 16px;
+  background: rgba(0,230,118,.1); border: 1px solid var(--green); border-radius: 2px;
+  font-size: 0.82rem; font-weight: 700; color: var(--green);
+  cursor: pointer; letter-spacing: 1px; transition: all 0.2s; white-space: nowrap;
+}
+.m2-actions button:hover { background: rgba(0,230,118,.2); }
+
+.m2-total-box {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg3); border: 1px solid var(--green);
+  border-radius: 2px; padding: 12px 16px; margin-bottom: 12px;
+}
+.m2-total-label { font-size: 0.72rem; font-weight: 800; color: var(--text-md); letter-spacing: 2px; text-transform: uppercase; }
+.m2-total-value {
+  font-family: 'Orbitron', monospace; font-size: 1.2rem; font-weight: 700;
+  color: var(--green); text-shadow: 0 0 12px rgba(0,230,118,.3);
+}
+
+#m2List { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+
+.m2-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-left: 2px solid var(--green); border-radius: 2px;
+}
+.m2-item-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.m2-item-name { font-size: 0.9rem; font-weight: 700; color: var(--text-hi); }
+.m2-item-dim  { font-size: 0.7rem; font-weight: 600; color: var(--text-lo); }
+.m2-item-val  {
+  font-family: 'Orbitron', monospace; font-size: 0.82rem; font-weight: 700;
+  color: var(--green); white-space: nowrap; flex-shrink: 0;
+}
+
+.m2-clear-btn {
+  width: 100%; padding: 8px; background: none;
+  border: 1px solid var(--border); border-radius: 2px;
+  font-size: 0.75rem; font-weight: 700; color: var(--text-lo);
+  cursor: pointer; letter-spacing: 1px; transition: all 0.15s;
+}
+.m2-clear-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* ── Hesap Makinası ───────────────────────────────────── */
+.calc-display {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 2px; padding: 14px 16px; margin-bottom: 12px; text-align: right;
+}
+.calc-expr {
+  font-size: 0.78rem; font-weight: 600; color: var(--text-lo);
+  min-height: 18px; margin-bottom: 4px; letter-spacing: 0.5px;
+}
+.calc-screen {
+  font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 700;
+  color: var(--yellow); text-shadow: 0 0 14px rgba(255,215,64,.3);
+  word-break: break-all; line-height: 1.1;
+}
+
+.calc-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+
+.calc-btn {
+  padding: 18px 8px; border-radius: 2px;
+  background: var(--bg3); border: 1px solid var(--border);
+  font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700;
+  color: var(--text-hi); cursor: pointer; transition: all 0.15s;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.calc-btn:hover  { border-color: var(--border2); background: var(--bg2); }
+.calc-btn:active { transform: scale(0.95); }
+
+.calc-btn.span2 { grid-column: span 2; }
+
+.calc-btn.op {
+  background: var(--pur-dim); border-color: rgba(181,123,238,.3);
+  color: var(--purple);
+}
+.calc-btn.op:hover { background: rgba(181,123,238,.2); }
+
+.calc-btn.eq {
+  background: rgba(255,215,64,.12); border-color: rgba(255,215,64,.3);
+  color: var(--yellow);
+}
+.calc-btn.eq:hover { background: rgba(255,215,64,.22); }
+
 /* ── Responsive / Mobil Tab ───────────────────────────── */
 @media (max-width: 720px) {
   .panels {
@@ -525,8 +623,10 @@ body {
     -webkit-tap-highlight-color: transparent;
   }
 
-  .mobile-tab.active { color: var(--cyan); }
-  #mobileTabFinance.active { color: var(--purple); }
+  .mobile-tab.active         { color: var(--cyan); }
+  #mobileTabFinance.active   { color: var(--purple); }
+  #mobileTabM2.active        { color: var(--green); }
+  #mobileTabCalc.active      { color: var(--yellow); }
 
   .mobile-tab-icon { font-size: 1.2rem; line-height: 1; }
   .mobile-tab-label {
