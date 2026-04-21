@@ -1,8 +1,9 @@
 const SUPABASE_URL = 'https://fpmyvjkhbjvfqjoctlfy.supabase.co';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwbXl2amtoYmp2ZnFqb2N0bGZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3OTA1ODYsImV4cCI6MjA5MjM2NjU4Nn0.nSfdJhEBYkmAtedTaP0G9g4R_gwIXYL946maxKHgyo8';
 
-const AUTH_URL  = `${SUPABASE_URL}/auth/v1`;
-const TODOS_URL = `${SUPABASE_URL}/rest/v1/todos`;
+const AUTH_URL   = `${SUPABASE_URL}/auth/v1`;
+const TODOS_URL  = `${SUPABASE_URL}/rest/v1/todos`;
+const TRANS_URL  = `${SUPABASE_URL}/rest/v1/transactions`;
 
 // ── Session ──────────────────────────────────────────────
 let session = JSON.parse(localStorage.getItem('sb_session') || 'null');
@@ -80,6 +81,96 @@ async function handleHashTokens() {
     return false; // already logged in
   }
   return false;
+}
+
+// ── Transactions API ─────────────────────────────────────
+let transactions = [];
+let transType = 'gelir';
+
+async function loadTransactions() {
+  const data = await apiFetch(`${TRANS_URL}?order=created_at.desc`, {
+    headers: { ...authHeaders(), 'Prefer': 'return=representation' },
+  });
+  transactions = Array.isArray(data) ? data : [];
+  renderFinance();
+}
+
+async function addTransaction(type, description, amount) {
+  const headers = { ...authHeaders(), 'Prefer': 'return=representation' };
+  const data = await apiFetch(TRANS_URL, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ type, description, amount, user_id: session?.user?.id }),
+  });
+  transactions.unshift(Array.isArray(data) ? data[0] : data);
+  renderFinance();
+}
+
+async function removeTransaction(id) {
+  await apiFetch(`${TRANS_URL}?id=eq.${id}`, { method: 'DELETE' });
+  transactions = transactions.filter(t => t.id !== id);
+  renderFinance();
+}
+
+function formatMoney(n) {
+  return Number(n).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₺';
+}
+
+function renderFinance() {
+  const list = document.getElementById('transactionList');
+  list.innerHTML = '';
+
+  const totalGelir = transactions.filter(t => t.type === 'gelir').reduce((s, t) => s + Number(t.amount), 0);
+  const totalGider = transactions.filter(t => t.type === 'gider').reduce((s, t) => s + Number(t.amount), 0);
+  const net = totalGelir - totalGider;
+
+  document.getElementById('totalGelir').textContent = formatMoney(totalGelir);
+  document.getElementById('totalGider').textContent = formatMoney(totalGider);
+  const netEl = document.getElementById('netBakiye');
+  netEl.textContent = formatMoney(net);
+  netEl.className = 'summary-amount ' + (net >= 0 ? 'pozitif' : 'negatif');
+
+  if (!transactions.length) {
+    const li = document.createElement('li');
+    li.className = 'empty-msg';
+    li.textContent = 'Henüz kayıt eklenmedi.';
+    list.appendChild(li);
+    return;
+  }
+
+  transactions.forEach(t => {
+    const li = document.createElement('li');
+    li.className = `trans-item ${t.type}`;
+
+    const badge = document.createElement('span');
+    badge.className = 'trans-badge';
+    badge.textContent = t.type === 'gelir' ? '▲' : '▼';
+    badge.title = t.type === 'gelir' ? 'Gelir' : 'Gider';
+
+    const info = document.createElement('div');
+    info.className = 'trans-info';
+
+    const desc = document.createElement('span');
+    desc.className = 'trans-desc';
+    desc.textContent = t.description;
+
+    const date = document.createElement('span');
+    date.className = 'trans-date';
+    date.textContent = t.created_at ? formatDate(t.created_at) : '';
+
+    info.append(desc, date);
+
+    const amount = document.createElement('span');
+    amount.className = 'trans-amount';
+    amount.textContent = (t.type === 'gider' ? '−' : '+') + formatMoney(t.amount);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-delete'; delBtn.textContent = '✕'; delBtn.title = 'Sil';
+    delBtn.addEventListener('click', () => removeTransaction(t.id));
+
+    li.append(badge, info, amount, delBtn);
+    list.appendChild(li);
+  });
 }
 
 // ── Todos API ─────────────────────────────────────────────
@@ -329,6 +420,7 @@ function showApp() {
   document.getElementById('appWrap').classList.remove('hidden');
   document.getElementById('userEmail').textContent = session?.user?.email || '';
   loadTodos();
+  loadTransactions();
 }
 
 function showAuth() {
@@ -403,6 +495,24 @@ document.getElementById('todoForm').addEventListener('submit', async e => {
 });
 
 document.getElementById('clearCompleted').addEventListener('click', clearCompleted);
+
+document.querySelectorAll('.type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    transType = btn.dataset.type;
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.getElementById('transactionForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const desc   = document.getElementById('transDesc').value.trim();
+  const amount = parseFloat(document.getElementById('transAmount').value);
+  if (!desc || isNaN(amount) || amount <= 0) return;
+  document.getElementById('transDesc').value   = '';
+  document.getElementById('transAmount').value = '';
+  await addTransaction(transType, desc, amount);
+});
 
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {

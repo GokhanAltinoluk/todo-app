@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Yapılacaklar</title>
+  <title>Yapılacaklar & Finans</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -11,8 +14,9 @@
   <!-- AUTH SCREEN -->
   <div class="auth-wrap" id="authWrap">
     <div class="auth-card">
-      <div class="auth-logo">✅</div>
-      <h1 class="auth-title">Yapılacaklar</h1>
+      <div class="auth-logo">⬡</div>
+      <h1 class="auth-title">NEXUS</h1>
+      <p class="auth-subtitle">Görev & Finans Yönetimi</p>
 
       <div class="auth-tabs">
         <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Giriş Yap</button>
@@ -51,37 +55,86 @@
 
   <!-- EMAIL CONFIRMED banner -->
   <div class="banner hidden" id="confirmedBanner">
-    🎉 E-posta adresin doğrulandı! Şimdi giriş yapabilirsin.
+    E-posta adresin doğrulandı! Şimdi giriş yapabilirsin.
   </div>
 
-  <!-- TODO SCREEN -->
+  <!-- APP SCREEN -->
   <div class="app-wrap hidden" id="appWrap">
-    <div class="container">
-      <header class="app-header">
-        <h1>Yapılacaklar</h1>
-        <div class="user-info">
-          <span id="userEmail"></span>
-          <button id="logoutBtn">Çıkış</button>
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <span class="topbar-logo">⬡ NEXUS</span>
+      <div class="user-info">
+        <span id="userEmail"></span>
+        <button id="logoutBtn">Çıkış</button>
+      </div>
+    </div>
+
+    <div class="panels">
+
+      <!-- TODO PANEL -->
+      <div class="panel" id="todoPanel">
+        <div class="panel-header">
+          <h2 class="panel-title">Görevler</h2>
         </div>
-      </header>
 
-      <form class="input-row" id="todoForm">
-        <input type="text" id="todoInput" placeholder="Yeni görev ekle..." autocomplete="off" />
-        <button type="submit">Ekle</button>
-      </form>
+        <form class="input-row" id="todoForm">
+          <input type="text" id="todoInput" placeholder="Yeni görev ekle..." autocomplete="off" />
+          <button type="submit">Ekle</button>
+        </form>
 
-      <div class="filters">
-        <button class="filter-btn active" data-filter="all">Tümü</button>
-        <button class="filter-btn" data-filter="active">Aktif</button>
-        <button class="filter-btn" data-filter="completed">Tamamlanan</button>
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">Tümü</button>
+          <button class="filter-btn" data-filter="active">Aktif</button>
+          <button class="filter-btn" data-filter="completed">Tamamlanan</button>
+        </div>
+
+        <ul id="todoList"></ul>
+
+        <div class="footer" id="footer">
+          <span id="remaining"></span>
+          <button id="clearCompleted">Tamamlananları sil</button>
+        </div>
       </div>
 
-      <ul id="todoList"></ul>
+      <!-- FINANCE PANEL -->
+      <div class="panel" id="financePanel">
+        <div class="panel-header">
+          <h2 class="panel-title">Gelir / Gider</h2>
+        </div>
 
-      <div class="footer" id="footer">
-        <span id="remaining"></span>
-        <button id="clearCompleted">Tamamlananları sil</button>
+        <!-- Summary cards -->
+        <div class="finance-summary">
+          <div class="summary-card gelir-card">
+            <span class="summary-label">Toplam Gelir</span>
+            <span class="summary-amount pozitif" id="totalGelir">0,00 ₺</span>
+          </div>
+          <div class="summary-card gider-card">
+            <span class="summary-label">Toplam Gider</span>
+            <span class="summary-amount negatif" id="totalGider">0,00 ₺</span>
+          </div>
+          <div class="summary-card net-card">
+            <span class="summary-label">Net Bakiye</span>
+            <span class="summary-amount" id="netBakiye">0,00 ₺</span>
+          </div>
+        </div>
+
+        <!-- Add form -->
+        <form class="transaction-form" id="transactionForm">
+          <div class="type-toggle">
+            <button type="button" class="type-btn active" data-type="gelir">+ Gelir</button>
+            <button type="button" class="type-btn" data-type="gider">− Gider</button>
+          </div>
+          <div class="trans-inputs">
+            <input type="text" id="transDesc" placeholder="Açıklama..." autocomplete="off" />
+            <input type="number" id="transAmount" placeholder="Tutar (₺)" min="0.01" step="0.01" />
+            <button type="submit">Ekle</button>
+          </div>
+        </form>
+
+        <ul id="transactionList"></ul>
       </div>
+
     </div>
   </div>
 
