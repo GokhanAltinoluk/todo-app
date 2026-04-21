@@ -39,6 +39,69 @@ function toggleTheme() {
   applyTheme(cur === 'dark' ? 'light' : 'dark');
 }
 
+// ── Ses ───────────────────────────────────────────────────
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+// iOS'ta ilk dokunuşta AudioContext'i aç
+document.addEventListener('touchend', function unlockAudio() {
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  document.removeEventListener('touchend', unlockAudio);
+}, { once: true });
+
+function playBeep() {
+  try {
+    const ctx = getAudioCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    // Üç tonlu fütüristik uyarı sesi
+    [[0, 880], [0.18, 1100], [0.36, 880]].forEach(([offset, freq]) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.28, ctx.currentTime + offset);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.15);
+      osc.start(ctx.currentTime + offset);
+      osc.stop(ctx.currentTime + offset + 0.16);
+    });
+  } catch (e) { console.warn('Ses çalınamadı:', e); }
+}
+
+// Hangi görevler için zaten bildirim verildi
+const alertedIds = new Set(JSON.parse(localStorage.getItem('nexus_alerted') || '[]'));
+
+function checkDueTodos() {
+  if (!todos.length) return;
+  const now = Date.now();
+  let fired = false;
+
+  todos.filter(t => !t.done && t.due_date).forEach(t => {
+    const due = new Date(t.due_date).getTime();
+    // Vadesi geçmiş ama henüz bildirilmemiş (son 2 dakika içinde geçti)
+    if (due <= now && due > now - 120_000 && !alertedIds.has(String(t.id))) {
+      alertedIds.add(String(t.id));
+      localStorage.setItem('nexus_alerted', JSON.stringify([...alertedIds]));
+
+      if (!fired) { playBeep(); fired = true; }
+
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Görev vakti geldi — NEXUS', {
+          body: t.text,
+          icon: '/todo-app/icons/icon-192.png',
+          tag: `due-${t.id}`,
+        });
+      }
+    }
+  });
+}
+
 // ── Bildirimler ───────────────────────────────────────────
 async function requestNotifPermission() {
   if (!('Notification' in window)) return;
@@ -504,6 +567,9 @@ function showApp() {
   loadTodos().catch(console.error);
   loadTransactions().catch(console.error);
   if ('Notification' in window) updateNotifBtn(Notification.permission);
+
+  // Her 30 saniyede vadesi gelen görevleri kontrol et
+  setInterval(checkDueTodos, 30_000);
 }
 
 function showAuth() {
