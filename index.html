@@ -3,29 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Todo App</title>
+  <title>Yapılacaklar</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Yapılacaklar</h1>
 
-    <form class="input-row" id="todoForm">
-      <input type="text" id="todoInput" placeholder="Yeni görev ekle..." autocomplete="off" />
-      <button type="submit">Ekle</button>
-    </form>
+  <!-- AUTH SCREEN -->
+  <div class="auth-wrap" id="authWrap">
+    <div class="auth-card">
+      <div class="auth-logo">✅</div>
+      <h1 class="auth-title">Yapılacaklar</h1>
 
-    <div class="filters">
-      <button class="filter-btn active" data-filter="all">Tümü</button>
-      <button class="filter-btn" data-filter="active">Aktif</button>
-      <button class="filter-btn" data-filter="completed">Tamamlanan</button>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Giriş Yap</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Kayıt Ol</button>
+      </div>
+
+      <!-- Login form -->
+      <form class="auth-form" id="loginForm">
+        <div class="field">
+          <label>E-posta</label>
+          <input type="email" id="loginEmail" placeholder="ornek@email.com" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label>Şifre</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn-primary" id="loginBtn">Giriş Yap</button>
+        <p class="auth-msg" id="loginMsg"></p>
+      </form>
+
+      <!-- Register form -->
+      <form class="auth-form hidden" id="registerForm">
+        <div class="field">
+          <label>E-posta</label>
+          <input type="email" id="regEmail" placeholder="ornek@email.com" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label>Şifre <span class="hint">(en az 6 karakter)</span></label>
+          <input type="password" id="regPassword" placeholder="••••••••" required autocomplete="new-password" minlength="6" />
+        </div>
+        <button type="submit" class="btn-primary" id="registerBtn">Kayıt Ol</button>
+        <p class="auth-msg" id="registerMsg"></p>
+      </form>
     </div>
+  </div>
 
-    <ul id="todoList"></ul>
+  <!-- EMAIL CONFIRMED banner -->
+  <div class="banner hidden" id="confirmedBanner">
+    🎉 E-posta adresin doğrulandı! Şimdi giriş yapabilirsin.
+  </div>
 
-    <div class="footer" id="footer">
-      <span id="remaining"></span>
-      <button id="clearCompleted">Tamamlananları sil</button>
+  <!-- TODO SCREEN -->
+  <div class="app-wrap hidden" id="appWrap">
+    <div class="container">
+      <header class="app-header">
+        <h1>Yapılacaklar</h1>
+        <div class="user-info">
+          <span id="userEmail"></span>
+          <button id="logoutBtn">Çıkış</button>
+        </div>
+      </header>
+
+      <form class="input-row" id="todoForm">
+        <input type="text" id="todoInput" placeholder="Yeni görev ekle..." autocomplete="off" />
+        <button type="submit">Ekle</button>
+      </form>
+
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">Tümü</button>
+        <button class="filter-btn" data-filter="active">Aktif</button>
+        <button class="filter-btn" data-filter="completed">Tamamlanan</button>
+      </div>
+
+      <ul id="todoList"></ul>
+
+      <div class="footer" id="footer">
+        <span id="remaining"></span>
+        <button id="clearCompleted">Tamamlananları sil</button>
+      </div>
     </div>
   </div>
 
