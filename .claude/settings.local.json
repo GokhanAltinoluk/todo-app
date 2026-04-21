@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git config *)",
+      "Bash(gh repo *)",
+      "Bash(curl -s https://api.supabase.com/v1/projects -H 'Authorization: Bearer sbp_26901677d01b7a2aef29a85d3327861c8f074a89')",
+      "Bash(python -m json.tool)",
+      "Bash(curl *)",
+      "Bash(git push *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git remote *)",
+      "Bash(gh api *)"
+    ]
+  }
+}

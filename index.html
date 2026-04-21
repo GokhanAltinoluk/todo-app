@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>NEXUS</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#00f5ff" />
-
-  <!-- iOS PWA -->
+  <meta name="theme-color" content="#00e5ff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="NEXUS" />
@@ -22,19 +19,16 @@
 </head>
 <body>
 
-  <!-- AUTH SCREEN -->
+  <!-- AUTH -->
   <div class="auth-wrap" id="authWrap">
     <div class="auth-card">
       <div class="auth-logo">⬡</div>
       <h1 class="auth-title">NEXUS</h1>
       <p class="auth-subtitle">Görev & Finans Yönetimi</p>
-
       <div class="auth-tabs">
         <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Giriş Yap</button>
         <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Kayıt Ol</button>
       </div>
-
-      <!-- Login form -->
       <form class="auth-form" id="loginForm">
         <div class="field">
           <label>E-posta</label>
@@ -47,8 +41,6 @@
         <button type="submit" class="btn-primary" id="loginBtn">Giriş Yap</button>
         <p class="auth-msg" id="loginMsg"></p>
       </form>
-
-      <!-- Register form -->
       <form class="auth-form hidden" id="registerForm">
         <div class="field">
           <label>E-posta</label>
@@ -64,18 +56,18 @@
     </div>
   </div>
 
-  <!-- EMAIL CONFIRMED banner -->
   <div class="banner hidden" id="confirmedBanner">
     E-posta adresin doğrulandı! Şimdi giriş yapabilirsin.
   </div>
 
-  <!-- APP SCREEN -->
+  <!-- APP -->
   <div class="app-wrap hidden" id="appWrap">
 
-    <!-- TOP BAR -->
     <div class="topbar">
       <span class="topbar-logo">⬡ NEXUS</span>
-      <div class="user-info">
+      <div class="topbar-right">
+        <button class="icon-btn" id="notifBtn" title="Bildirimlere izin ver">🔔</button>
+        <button class="icon-btn" id="themeBtn" title="Tema değiştir">☀</button>
         <span id="userEmail"></span>
         <button id="logoutBtn">Çıkış</button>
       </div>
@@ -83,7 +75,7 @@
 
     <div class="panels">
 
-      <!-- TODO PANEL -->
+      <!-- GÖREVLER -->
       <div class="panel" id="todoPanel">
         <div class="panel-header">
           <h2 class="panel-title">Görevler</h2>
@@ -94,6 +86,23 @@
           <button type="submit">Ekle</button>
         </form>
 
+        <button class="extra-toggle" id="todoExtraToggle">+ Seçenekler</button>
+        <div class="todo-extra" id="todoExtra">
+          <div class="extra-field">
+            <label>Son tarih</label>
+            <input type="datetime-local" id="todoDueDate" />
+          </div>
+          <div class="extra-field">
+            <label>Tekrar</label>
+            <select id="todoRepeat">
+              <option value="none">Tekrar yok</option>
+              <option value="daily">Her gün</option>
+              <option value="weekly">Her hafta</option>
+              <option value="monthly">Her ay</option>
+            </select>
+          </div>
+        </div>
+
         <div class="filters">
           <button class="filter-btn active" data-filter="all">Tümü</button>
           <button class="filter-btn" data-filter="active">Aktif</button>
@@ -102,19 +111,18 @@
 
         <ul id="todoList"></ul>
 
-        <div class="footer" id="footer">
+        <div class="footer">
           <span id="remaining"></span>
           <button id="clearCompleted">Tamamlananları sil</button>
         </div>
       </div>
 
-      <!-- FINANCE PANEL -->
+      <!-- GELİR/GİDER -->
       <div class="panel" id="financePanel">
         <div class="panel-header">
           <h2 class="panel-title">Gelir / Gider</h2>
         </div>
 
-        <!-- Summary cards -->
         <div class="finance-summary">
           <div class="summary-card gelir-card">
             <span class="summary-label">Toplam Gelir</span>
@@ -130,7 +138,29 @@
           </div>
         </div>
 
-        <!-- Add form -->
+        <!-- Aylık Hedefler -->
+        <div class="budget-section">
+          <div class="budget-header">
+            <span class="budget-title">Aylık Hedefler</span>
+            <button class="budget-edit-btn" id="editBudgetBtn">Düzenle</button>
+          </div>
+          <div class="budget-row">
+            <span class="budget-label">Gelir Hedefi</span>
+            <div class="progress-bar"><div class="progress-fill gelir-fill" id="gelirProgress"></div></div>
+            <span class="budget-val" id="gelirPct">—</span>
+          </div>
+          <div class="budget-row">
+            <span class="budget-label">Gider Limiti</span>
+            <div class="progress-bar"><div class="progress-fill gider-fill" id="giderProgress"></div></div>
+            <span class="budget-val" id="giderPct">—</span>
+          </div>
+          <div class="budget-form hidden" id="budgetForm">
+            <input type="number" id="gelirHedef" placeholder="Gelir hedefi (₺)" min="0" step="100" />
+            <input type="number" id="giderLimit" placeholder="Gider limiti (₺)" min="0" step="100" />
+            <button type="button" id="saveBudgetBtn">Kaydet</button>
+          </div>
+        </div>
+
         <form class="transaction-form" id="transactionForm">
           <div class="type-toggle">
             <button type="button" class="type-btn active" data-type="gelir">+ Gelir</button>
