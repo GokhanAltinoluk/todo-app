@@ -12,8 +12,8 @@
   --bg2:     #0d1424;
   --bg3:     #111827;
   --border:  #1e2d45;
-  --text:    #e2e8f0;
-  --muted:   #4a6080;
+  --text:    #ffffff;
+  --muted:   #94a3b8;
   --glow-c:  0 0 12px rgba(0,245,255,.35);
   --glow-p:  0 0 12px rgba(168,85,247,.35);
 }
@@ -23,7 +23,8 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: 'Rajdhani', system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 600;
   overflow-x: hidden;
 }
 
@@ -254,8 +255,9 @@ body::before {
 }
 
 .user-info span {
-  font-size: 0.8rem;
-  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #cbd5e1;
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -442,12 +444,12 @@ body::before {
 
 .todo-item .todo-text {
   flex: 1;
-  font-size: 0.95rem;
-  color: var(--text);
+  font-size: 1rem;
+  color: #ffffff;
   word-break: break-word;
   cursor: pointer;
   outline: none;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .todo-item.completed .todo-text { text-decoration: line-through; color: var(--muted); }
@@ -485,21 +487,23 @@ body::before {
 
 .todo-date,
 .todo-elapsed {
-  font-size: 0.72rem;
-  color: var(--muted);
+  font-size: 0.75rem;
+  color: #cbd5e1;
   font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
 }
 
 .todo-completed-at,
 .todo-completed-elapsed {
-  font-size: 0.72rem;
-  color: var(--green);
+  font-size: 0.75rem;
+  color: #4ade80;
   font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
 }
 
 .meta-label {
-  font-weight: 700;
-  opacity: 0.6;
+  font-weight: 900;
+  color: #94a3b8;
 }
 
 /* Footer */
@@ -508,8 +512,9 @@ body::before {
   align-items: center;
   justify-content: space-between;
   margin-top: 16px;
-  font-size: 0.8rem;
-  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #cbd5e1;
   letter-spacing: 0.5px;
 }
 
@@ -561,9 +566,9 @@ body::before {
 .net-card   { border-top: 2px solid var(--cyan); }
 
 .summary-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #cbd5e1;
   letter-spacing: 1.5px;
   text-transform: uppercase;
 }
@@ -699,17 +704,18 @@ body::before {
 }
 
 .trans-desc {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .trans-date {
-  font-size: 0.7rem;
-  color: var(--muted);
+  font-size: 0.75rem;
+  color: #cbd5e1;
+  font-weight: 700;
 }
 
 .trans-amount {
