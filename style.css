@@ -2,6 +2,14 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* iOS dokunma gecikmesi ve highlight düzeltmesi */
+button, input, select, a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button { cursor: pointer; }
+
 /* ── Tema değişkenleri ────────────────────────────────── */
 :root, [data-theme="dark"] {
   --cyan:     #00e5ff;
