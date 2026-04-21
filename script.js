@@ -288,24 +288,6 @@ function render() {
     todos.some(t => t.done) ? 'inline' : 'none';
 }
 
-const TODO_COLORS = [
-  { bg: '#eef2ff', border: '#818cf8' }, // mor
-  { bg: '#ecfdf5', border: '#34d399' }, // yeşil
-  { bg: '#fff7ed', border: '#fb923c' }, // turuncu
-  { bg: '#fdf4ff', border: '#c084fc' }, // leylak
-  { bg: '#fff1f2', border: '#fb7185' }, // pembe
-  { bg: '#f0fdfa', border: '#2dd4bf' }, // turkuaz
-  { bg: '#fefce8', border: '#facc15' }, // sarı
-  { bg: '#eff6ff', border: '#60a5fa' }, // mavi
-];
-
-function todoColorIndex(id) {
-  const str = String(id);
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
-  return hash % TODO_COLORS.length;
-}
-
 function formatDate(iso) {
   const d = new Date(iso);
   const pad = n => String(n).padStart(2, '0');
@@ -343,9 +325,6 @@ function formatElapsed(iso) {
 function buildItem(todo) {
   const li = document.createElement('li');
   li.className = 'todo-item' + (todo.done ? ' completed' : '');
-  const col = TODO_COLORS[todoColorIndex(todo.id)];
-  li.style.background = col.bg;
-  li.style.borderColor = col.border;
 
   const cb = document.createElement('input');
   cb.type = 'checkbox'; cb.checked = todo.done;
