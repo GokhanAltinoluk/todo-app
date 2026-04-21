@@ -256,12 +256,44 @@ body {
 
 .todo-item {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
   padding: 10px 12px;
   border: 1px solid #ebebeb;
+  border-left: 4px solid #ebebeb;
   border-radius: 10px;
   background: #fafafa;
+  transition: opacity 0.2s;
+}
+
+.todo-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.todo-meta {
+  display: flex;
+  gap: 16px;
+  padding-left: 2px;
+  flex-wrap: wrap;
+}
+
+.todo-date,
+.todo-elapsed {
+  font-size: 0.74rem;
+  color: #aaa;
+}
+
+.todo-completed-at,
+.todo-completed-elapsed {
+  font-size: 0.74rem;
+  color: #5dba8a;
+}
+
+.meta-label {
+  font-weight: 600;
+  color: #bbb;
 }
 
 .todo-item.completed { opacity: 0.55; }

@@ -107,12 +107,23 @@ async function addTodo(text) {
 
 async function toggleTodo(id) {
   const todo = todos.find(t => t.id === id);
-  await apiFetch(`${TODOS_URL}?id=eq.${id}`, {
-    method: 'PATCH',
-    headers: { ...authHeaders(), 'Prefer': 'return=minimal' },
-    body: JSON.stringify({ done: !todo.done }),
-  });
-  todo.done = !todo.done;
+  const nowDone = !todo.done;
+  const completed_at = nowDone ? new Date().toISOString() : null;
+  try {
+    await apiFetch(`${TODOS_URL}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { ...authHeaders(), 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ done: nowDone, completed_at }),
+    });
+    todo.completed_at = completed_at;
+  } catch {
+    await apiFetch(`${TODOS_URL}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { ...authHeaders(), 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ done: nowDone }),
+    });
+  }
+  todo.done = nowDone;
   render();
 }
 
@@ -169,9 +180,64 @@ function render() {
     todos.some(t => t.done) ? 'inline' : 'none';
 }
 
+const TODO_COLORS = [
+  { bg: '#eef2ff', border: '#818cf8' }, // mor
+  { bg: '#ecfdf5', border: '#34d399' }, // yeşil
+  { bg: '#fff7ed', border: '#fb923c' }, // turuncu
+  { bg: '#fdf4ff', border: '#c084fc' }, // leylak
+  { bg: '#fff1f2', border: '#fb7185' }, // pembe
+  { bg: '#f0fdfa', border: '#2dd4bf' }, // turkuaz
+  { bg: '#fefce8', border: '#facc15' }, // sarı
+  { bg: '#eff6ff', border: '#60a5fa' }, // mavi
+];
+
+function todoColorIndex(id) {
+  const str = String(id);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+  return hash % TODO_COLORS.length;
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function formatElapsedBetween(fromIso, toIso) {
+  const diffMs = new Date(toIso).getTime() - new Date(fromIso).getTime();
+  const totalSec = Math.floor(diffMs / 1000);
+  if (totalSec < 60) return 'Birkaç saniye';
+  const totalMin = Math.floor(totalSec / 60);
+  if (totalMin < 60) return `${totalMin} dakika`;
+  const hours = Math.floor(totalMin / 60);
+  const mins  = totalMin % 60;
+  if (hours < 24) return mins > 0 ? `${hours} sa ${mins} dk` : `${hours} saat`;
+  const days  = Math.floor(hours / 24);
+  const remH  = hours % 24;
+  return remH > 0 ? `${days} gün ${remH} sa` : `${days} gün`;
+}
+
+function formatElapsed(iso) {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const totalSec = Math.floor(diffMs / 1000);
+  if (totalSec < 60) return 'Az önce';
+  const totalMin = Math.floor(totalSec / 60);
+  if (totalMin < 60) return `${totalMin} dakika`;
+  const hours = Math.floor(totalMin / 60);
+  const mins  = totalMin % 60;
+  if (hours < 24) return mins > 0 ? `${hours} sa ${mins} dk` : `${hours} saat`;
+  const days  = Math.floor(hours / 24);
+  const remH  = hours % 24;
+  return remH > 0 ? `${days} gün ${remH} sa` : `${days} gün`;
+}
+
 function buildItem(todo) {
   const li = document.createElement('li');
   li.className = 'todo-item' + (todo.done ? ' completed' : '');
+  const col = TODO_COLORS[todoColorIndex(todo.id)];
+  li.style.background = col.bg;
+  li.style.borderColor = col.border;
 
   const cb = document.createElement('input');
   cb.type = 'checkbox'; cb.checked = todo.done;
@@ -195,7 +261,36 @@ function buildItem(todo) {
   delBtn.className = 'btn-delete'; delBtn.textContent = '✕'; delBtn.title = 'Sil';
   delBtn.addEventListener('click', () => removeTodo(todo.id));
 
-  li.append(cb, mood, span, editBtn, delBtn);
+  const meta = document.createElement('div');
+  meta.className = 'todo-meta';
+
+  const dateSpan = document.createElement('span');
+  dateSpan.className = 'todo-date';
+  dateSpan.innerHTML = `<span class="meta-label">Eklenme:</span> ${todo.created_at ? formatDate(todo.created_at) : '—'}`;
+
+  const elapsedSpan = document.createElement('span');
+  elapsedSpan.className = 'todo-elapsed';
+  elapsedSpan.innerHTML = `<span class="meta-label">Geçen süre:</span> ${todo.created_at ? formatElapsed(todo.created_at) : '—'}`;
+
+  meta.append(dateSpan, elapsedSpan);
+
+  if (todo.done && todo.completed_at) {
+    const compSpan = document.createElement('span');
+    compSpan.className = 'todo-completed-at';
+    compSpan.innerHTML = `<span class="meta-label">Tamamlanma:</span> ${formatDate(todo.completed_at)}`;
+
+    const compElapsed = document.createElement('span');
+    compElapsed.className = 'todo-completed-elapsed';
+    compElapsed.innerHTML = `<span class="meta-label">Tamamlanma süresi:</span> ${formatElapsedBetween(todo.created_at, todo.completed_at)}`;
+
+    meta.append(compSpan, compElapsed);
+  }
+
+  const top = document.createElement('div');
+  top.className = 'todo-top';
+  top.append(cb, mood, span, editBtn, delBtn);
+
+  li.append(top, meta);
   return li;
 }
 
