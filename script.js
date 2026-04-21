@@ -88,28 +88,45 @@ let transactions = [];
 let transType = 'gelir';
 
 async function loadTransactions() {
-  const data = await apiFetch(`${TRANS_URL}?order=created_at.desc`, {
-    headers: { ...authHeaders(), 'Prefer': 'return=representation' },
-  });
-  transactions = Array.isArray(data) ? data : [];
+  try {
+    const data = await apiFetch(`${TRANS_URL}?order=created_at.desc`, {
+      headers: { ...authHeaders(), 'Prefer': 'return=representation' },
+    });
+    transactions = Array.isArray(data) ? data : [];
+  } catch {
+    transactions = [];
+  }
   renderFinance();
 }
 
 async function addTransaction(type, description, amount) {
-  const headers = { ...authHeaders(), 'Prefer': 'return=representation' };
-  const data = await apiFetch(TRANS_URL, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ type, description, amount, user_id: session?.user?.id }),
-  });
-  transactions.unshift(Array.isArray(data) ? data[0] : data);
-  renderFinance();
+  const btn = document.querySelector('#transactionForm button[type="submit"]');
+  const origText = btn.textContent;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const headers = { ...authHeaders(), 'Prefer': 'return=representation' };
+    const data = await apiFetch(TRANS_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ type, description, amount, user_id: session?.user?.id }),
+    });
+    transactions.unshift(Array.isArray(data) ? data[0] : data);
+    renderFinance();
+  } catch (err) {
+    alert('Kayıt eklenemedi: ' + err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = origText;
+  }
 }
 
 async function removeTransaction(id) {
-  await apiFetch(`${TRANS_URL}?id=eq.${id}`, { method: 'DELETE' });
-  transactions = transactions.filter(t => t.id !== id);
-  renderFinance();
+  try {
+    await apiFetch(`${TRANS_URL}?id=eq.${id}`, { method: 'DELETE' });
+    transactions = transactions.filter(t => t.id !== id);
+    renderFinance();
+  } catch (err) {
+    alert('Silinemedi: ' + err.message);
+  }
 }
 
 function formatMoney(n) {
@@ -419,8 +436,8 @@ function showApp() {
   document.getElementById('authWrap').classList.add('hidden');
   document.getElementById('appWrap').classList.remove('hidden');
   document.getElementById('userEmail').textContent = session?.user?.email || '';
-  loadTodos();
-  loadTransactions();
+  loadTodos().catch(console.error);
+  loadTransactions().catch(console.error);
 }
 
 function showAuth() {
