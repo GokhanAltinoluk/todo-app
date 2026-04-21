@@ -27,11 +27,15 @@
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
   color: var(--text-hi);
   font-size: 15px;
   font-weight: 600;
-  overflow-x: hidden;
+  /* iOS Safari: overflow-x hidden + sticky karışmaması için */
+  overflow-x: clip;
+  /* Momentum scroll */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Subtle star-grid */
@@ -134,13 +138,8 @@ body::after {
 .field .hint { font-weight: 500; color: var(--text-lo); }
 
 .field input {
-  width: 100%; padding: 10px 14px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  font-size: 0.95rem; font-weight: 600;
-  color: var(--text-hi); outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  padding: 10px 14px;
 }
 
 .field input:focus {
@@ -188,10 +187,15 @@ body::after {
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 32px;
+  /* iPhone notch/dynamic island için üst safe area */
+  padding-top: calc(14px + env(safe-area-inset-top));
   background: rgba(8,14,28,.9);
   border-bottom: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  position: sticky; top: 0; z-index: 10;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0; z-index: 10;
 }
 
 .topbar-logo {
@@ -223,6 +227,8 @@ body::after {
 .panels {
   display: flex; flex: 1;
   padding: 28px 24px; gap: 20px;
+  /* iPhone alt çubuğu için alt safe area */
+  padding-bottom: calc(28px + env(safe-area-inset-bottom));
   align-items: flex-start; flex-wrap: wrap;
 }
 
@@ -271,18 +277,22 @@ body::after {
 .input-row { display: flex; gap: 8px; margin-bottom: 14px; }
 
 .input-row input,
-.trans-inputs input {
+.trans-inputs input,
+.field input {
   flex: 1; padding: 9px 13px;
   background: var(--bg3);
   border: 1px solid var(--border);
   border-radius: 2px;
-  font-size: 0.95rem; font-weight: 600;
+  /* iOS zoom engellemek için min 16px */
+  font-size: 16px; font-weight: 600;
   color: var(--text-hi); outline: none;
+  -webkit-appearance: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input-row input:focus,
-.trans-inputs input:focus {
+.trans-inputs input:focus,
+.field input:focus {
   border-color: var(--cyan);
   box-shadow: 0 0 0 2px rgba(0,229,255,.06);
 }
@@ -465,6 +475,7 @@ body::after {
 #transactionList {
   list-style: none; display: flex; flex-direction: column; gap: 6px;
   max-height: 420px; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: thin; scrollbar-color: var(--border) transparent;
 }
 
@@ -518,7 +529,14 @@ body::after {
 
 /* Responsive */
 @media (max-width: 720px) {
-  .panels { padding: 14px; gap: 14px; }
+  .panels {
+    padding: 14px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    gap: 14px;
+  }
   .panel  { min-width: 100%; }
-  .topbar { padding: 12px 16px; }
+  .topbar {
+    padding: 12px 16px;
+    padding-top: calc(12px + env(safe-area-inset-top));
+  }
 }

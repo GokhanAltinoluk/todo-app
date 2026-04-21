@@ -3,6 +3,7 @@
   "short_name": "NEXUS",
   "description": "Görev yönetimi ve gelir/gider takibi",
   "start_url": "/todo-app/",
+  "scope": "/todo-app/",
   "display": "standalone",
   "background_color": "#060a14",
   "theme_color": "#00f5ff",
